@@ -1,0 +1,43 @@
+services:
+  frontend:
+    build: ./Frontend
+    ports:
+      - "5173:5173"
+    networks:
+      - app_network
+    environment:
+      # Change to localhost so your browser can find the backend
+      - VITE_API_URL=http://localhost:5000 
+    depends_on:
+      - backend
+
+  backend:
+    build: ./Backend
+    ports:
+      - "5000:5000"
+    networks:
+      - app_network
+    env_file:
+      - ./Backend/.env
+    # environment:
+    #   # Overriding the .env to ensure it uses the container name
+    #   - MONGO_URI=mongodb://mongodb:27017/bookstore_admin
+    depends_on:
+      - mongodb
+      
+  mongodb:
+    image: mongo:latest
+    # You can remove ports if you don't need to access Mongo from a GUI like Compass
+    ports:
+      - "27017:27017"
+    networks:
+      - app_network
+    volumes:
+      - mongo_data:/data/db
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
